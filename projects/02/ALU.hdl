@@ -44,15 +44,31 @@ CHIP ALU {
     PARTS:
    // Put you code here:
 
-    // Clear x is zx is set
+    // Clear x is 'zx' is set
     Mux16(a=x, b=false, sel=zx, out=xx1);
-    // Clar y if zy is set
-    Mux16(a=y, b=false, sel=zx, out=yy1);
-    // Negate x if nx is set (2 complement)
+    // Clar y if 'zy' is set
+    Mux16(a=y, b=false, sel=zy, out=yy1);
+    // Negate x if 'nx' is set (2 complement)
     Not16(in=xx1, out=nxx1);
     Mux16(a=xx1, b=nxx1, sel=nx, out=xx2);
-    // Negate y if ny is set (2 complement)
+    // Negate y if 'ny' is set (2 complement)
     Not16(in=yy1, out=nyy1);
     Mux16(a=yy1, b=nyy1, sel=ny, out=yy2);
 
+    // Compute depending on 'f' -> out = x + y (if f is set) or x & y (if f unset)
+    Add16(a=xx2, b=yy2, out=added);
+    And16(a=xx2, b=yy2, out=anded);
+    Mux16(a=anded, b=added, sel=f, out=result);
+
+    // Neagate output if 'no' set
+    // Use the weird syntax to get the 2 8 bit blocks to be used with Or8Way (we don't have Or16Way)
+    // Set 'ng' to true If the highest bit is set, that means a negative number.
+    Not16(in=result, out=nresult);
+    Mux16(a=result, b=nresult, sel=no, out=out, out[0..7]=out1, out[8..15]=out2, out[15]=ng);
+
+    // Set 'zr' if the number is zero, true if none of the bits are 1
+    Or8Way(in=out1, out=zr1);
+    Or8Way(in=out2, out=zr2);
+    Or(a=zr1, b=zr2, out=zr3);
+    Not(in=zr3, out=zr);
 }
