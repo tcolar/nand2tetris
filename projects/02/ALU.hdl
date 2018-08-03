@@ -43,4 +43,16 @@ CHIP ALU {
 
     PARTS:
    // Put you code here:
+
+    // Clear x is zx is set
+    Mux16(a=x, b=false, sel=zx, out=xx1);
+    // Clar y if zy is set
+    Mux16(a=y, b=false, sel=zx, out=yy1);
+    // Negate x if nx is set (2 complement)
+    Not16(in=xx1, out=nxx1);
+    Mux16(a=xx1, b=nxx1, sel=nx, out=xx2);
+    // Negate y if ny is set (2 complement)
+    Not16(in=yy1, out=nyy1);
+    Mux16(a=yy1, b=nyy1, sel=ny, out=yy2);
+
 }
