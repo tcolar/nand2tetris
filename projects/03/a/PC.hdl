@@ -20,8 +20,10 @@ CHIP PC {
     Mux16(a=feedback, b=o1, sel=inc, out=o2); // inc if requested (lowest priority)
     Mux16(a=o2, b=in, sel=load, out=o3); // new load if requested (medium priority)
     Mux16(a=o3, b=false, sel=reset, out=o4); // reset if requested (highest priority)
-    // Update the register if anything changed, maybe it's overkill and we could just always write (load=true) ?
-    Or(a=reset, b=load, out=or1);
-    Or(a=or1, b=inc, out=changed);
-    Register(in=o4, load=changed, out=out, out=feedback);
+    // Update the register if anything changed
+    // Looking at Register impl there is nothing to gain, so it's overkill.
+    //Or(a=reset, b=load, out=or1);
+    //Or(a=or1, b=inc, out=changed);
+    //Register(in=o4, load=changed, out=out, out=feedback);
+    Register(in=o4, load=true, out=out, out=feedback);
 }
